@@ -2,17 +2,26 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.schema = void 0;
 exports.schema = {
-    tags: ['feed'],
-    summary: 'Get feed data',
-    description: 'Get feed data',
     response: {
         200: {
-            type: 'object',
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    id: { type: "string" },
+                    title: { type: "string", nullable: true },
+                    url: { type: "string" },
+                    createdAt: { type: "string", format: "date-time" },
+                },
+                required: ["id", "url", "createdAt"],
+            },
+        },
+        500: {
+            type: "object",
             properties: {
-                hello: {
-                    type: 'string',
-                }
-            }
-        }
-    }
+                error: { type: "string" },
+            },
+            required: ["error"],
+        },
+    },
 };
