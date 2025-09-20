@@ -1,21 +1,51 @@
-import buildApp from "./app";
+import Fastify from 'fastify';
+import autoload from '@fastify/autoload';
+import path from 'path';
+import swagger from '@fastify/swagger';
+import swaggerUI from '@fastify/swagger-ui';
+import { schema as feedSchema } from './modules/feedParser/schemas/getFeedData.schema';
 
-async function start() {
-    const fastify = await buildApp({
-        logger: true,
-    })
+const fastify = Fastify({ logger: true });
 
-    const port = fastify.config.PORT
-    const host = fastify.config.HOST
+const start = async () => {
+  try {
+    await fastify.register(swagger, {
+      openapi: {
+        info: { title: 'RSS Feed API', version: '1.0.0' },
+        servers: [{ url: 'http://localhost:3000' }],
+      },
+    });
 
-    fastify.listen({port, host}, (err, address) => {
-        if(err){
-            console.log(err)
-            process.exit(1)
-        }
-        console.log(`Server running at ${address}`)
-    })
+    await fastify.register(swaggerUI, {
+      routePrefix: '/docs',
+      uiConfig: { docExpansion: 'list', deepLinking: false },
+    });
 
-}
+    await fastify.register(autoload, {
+      dir: path.join(process.cwd(), 'src/modules'),
+      options: { prefix: '/api' },
+    });
 
-void start()
+    fastify.get('/feed', { schema: feedSchema }, async () => {
+      return [
+        {
+          id: '1',
+          title: 'Пример RSS',
+          url: 'https://example.com/rss',
+          createdAt: new Date().toISOString(),
+        },
+      ];
+    });
+
+    fastify.get('/health', async () => ({ status: 'ok' }));
+
+    await fastify.listen({ port: 3000, host: '0.0.0.0' });
+    console.log('Server running at http://localhost:3000');
+    console.log('Swagger UI available at http://localhost:3000/docs');
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+
+void start();
