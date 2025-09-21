@@ -1,29 +1,22 @@
-import { FeedParserService } from '../feedParser.service';
+import { parseFeed } from "../feedParser.service";
 
-export class FeedService {
-  private feedCache: any = null;
-  private lastUrl: string = '';
-  private parserService: FeedParserService;
+let feedCache: any = null;
+let lastUrl = "";
 
-  constructor() {
-    this.parserService = new FeedParserService();
+export async function getFeed(url?: string, force?: boolean) {
+  const feedUrl = url || "https://default-rss-url.com/feed";
+
+  if (feedCache && lastUrl === feedUrl && !force) {
+    return feedCache;
   }
 
-  async getFeed(url?: string, force?: boolean) {
-    const feedUrl = url || 'https://default-rss-url.com/feed';
+  const feed = await parseFeed(feedUrl);
+  feedCache = feed;
+  lastUrl = feedUrl;
 
-    if (this.feedCache && this.lastUrl === feedUrl && !force) {
-      return this.feedCache;
-    }
+  return feed;
+}
 
-    const feed = await this.parserService.parse(feedUrl);
-    this.feedCache = feed;
-    this.lastUrl = feedUrl;
-
-    return feed;
-  }
-
-  async getAllFeeds() {
-    return this.feedCache || [];
-  }
+export async function getAllFeeds() {
+  return feedCache || [];
 }

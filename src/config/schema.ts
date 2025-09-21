@@ -7,10 +7,12 @@ export const EnvSchema = {
         HOST: { type: 'string', default: '127.0.0.1' },
         DATABASE_URL: { 
             type: 'string', 
+            format: "uri", 
             default: 'mongodb://localhost:27017/feeddb?replicaSet=rs0' 
         },
         DEFAULT_FEED_URL: { 
             type: 'string', 
+            format: "uri", 
             default: 'https://feeds.feedburner.com/oreilly/radar' 
         },
         NODE_ENV: {
