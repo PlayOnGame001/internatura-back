@@ -1,29 +1,14 @@
-import Fastify from "fastify";
-import autoload from "@fastify/autoload";
-import path from "path";
-
-const fastify = Fastify({ logger: true });
+import { buildApp } from "./app";
+import type { Config } from "./config/schema";
 
 const start = async () => {
-  try {
-    await fastify.register(autoload, {
-      dir: path.join(process.cwd(), "src/plugins"),
-    });
+  const app = await buildApp();
 
-    await fastify.register(autoload, {
-      dir: path.join(process.cwd(), "src/modules"),
-      options: { prefix: "/api" },
-    });
+  const { PORT, HOST } = app.config as Config;
 
-    fastify.get("/health", async () => ({ status: "ok" }));
-
-    await fastify.listen({ port: 3000, host: "0.0.0.0" });
-    console.log("Server running at http://localhost:3000");
-    console.log("Swagger UI available at http://localhost:3000/docs");
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
+  await app.listen({ port: PORT, host: HOST });
+  console.log(`Server started on http://${HOST}:${PORT}`);
+  console.log(`Swagger: http://${HOST}:${PORT}/docs`);
 };
 
 void start();
