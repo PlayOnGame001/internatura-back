@@ -3,25 +3,25 @@ import { schema as getFeedSchema } from "../schemas/getFeedData.schema";
 import { parseFeedSchema } from "../schemas/ParserFeedData.schema";
 import { parseArticleSchema } from "../schemas/ParserFeedArticle.schema";
 import { JsonSchemaToTsProvider } from "@fastify/type-provider-json-schema-to-ts";
-import { getAllFeeds } from "../services/feedService";
+import { getAllFeeds, parseFeed, parseArticle } from "../services/feedService";
 import { v4 as uuidv4 } from "uuid";
 import { FeedItem } from "../types/types";
-import { parseFeed, parseArticle } from "../services/feedService";
 
 export async function getFeedDataRoutes(fastify: FastifyInstance) {
   const route = fastify.withTypeProvider<JsonSchemaToTsProvider>();
 
-  // Получение всех сохранённых фидов из базы
-  route.get("/feed", { schema: getFeedSchema }, async (request, reply) => {
+  route.get("/feed", { schema: getFeedSchema }, async (_request, reply) => {
     try {
       const feeds: FeedItem[] = await getAllFeeds();
-
-      const response = feeds.map(feed => ({
-        id: feed.id || uuidv4(),
-        url: feed.link || "",
-        title: feed.title ?? null,
-        createdAt: feed.createdAt || new Date().toISOString(),
-      }));
+      const response = feeds.map(feed => {
+        const { id, link: url = "", title = null, createdAt } = feed;
+        return {
+          id: id || uuidv4(),
+          url,
+          title,
+          createdAt: createdAt || new Date().toISOString(),
+        };
+      });
 
       return response;
     } catch (error) {
@@ -30,30 +30,31 @@ export async function getFeedDataRoutes(fastify: FastifyInstance) {
   });
 
   route.get("/feed/parse", { schema: parseFeedSchema }, async (request, reply) => {
-    const { url } = request.query as { url: string };
+    const { url } = request.query;
     try {
       const items = await parseFeed(url);
-      const safeItems = items.map(item => ({
-        title: item.title || "",
-        link: item.link || "",
-        pubDate: item.pubDate || "",
-        content: item.content || "",
-      }));
-      return safeItems;
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ error: "Ошибка парсинга RSS" });
+
+      const safeItems = items.map(item => {
+        const { title = "", link = "", pubDate = "", content = "" } = item;
+        return { title, link, pubDate, content };
+      });
+      return safeItems;} 
+        catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({ error: "Ошибка парсинга RSS" });
     }
   });
 
   route.get("/feed/article", { schema: parseArticleSchema }, async (request, reply) => {
-    const { url } = request.query as { url: string };
+    const { url } = request.query;
+
     try {
       const article = await parseArticle(url);
+      const { title = "", content = "" } = article;
       return {
-        url,  
-        title: article.title || "",
-        content: article.content || "",
+        url,
+        title,
+        content,
       };
     } catch (error: any) {
       fastify.log.error(error);

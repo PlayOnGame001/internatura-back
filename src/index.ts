@@ -1,9 +1,14 @@
 import { buildApp } from "./app";
+import type { Config } from "./config/schema";
 
 const start = async () => {
   const app = await buildApp();
-  await app.listen({ port: 3000, host: "0.0.0.0" });
-  console.log("Swagger UI: http://localhost:3000/docs");
+
+  const { PORT, HOST } = app.config as Config;
+
+  await app.listen({ port: PORT, host: HOST });
+  console.log(`Server started on http://${HOST}:${PORT}`);
+  console.log(`Swagger: http://${HOST}:${PORT}/docs`);
 };
 
 void start();
