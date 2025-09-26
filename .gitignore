@@ -4,5 +4,6 @@ node_modules
 node_modules/
 build/
 dist/
+cheerio-test.js
 
 /src/generated/prisma
