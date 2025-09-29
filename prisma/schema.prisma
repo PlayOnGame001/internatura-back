@@ -58,7 +58,7 @@ model User {
 }
 
 model LineItem {
-  id          String   @id @default(uuid()) @map("_id")
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   size        String
   minCpm      Float
   maxCpm      Float
@@ -68,4 +68,6 @@ model LineItem {
   creativeUrl String
   usedCount   Int      @default(0)
   createdAt   DateTime @default(now())
+  
+  @@map("line_items")
 }
