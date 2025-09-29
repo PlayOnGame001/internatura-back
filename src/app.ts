@@ -6,6 +6,7 @@ import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route"
 import { userRout } from "./modules/feedParser/routes/userRout";
 import { healthRoute } from "./modules/feedParser/routes/health.route";
 import { lineItemRoutes } from "./modules/AddService/route/lineItem.routes";
+import { bidAdapterRoutes } from "./modules/AddService/route/BidAdapter.routes";
 
 export type AppOptions = Partial<FastifyServerOptions>;
 
@@ -23,6 +24,7 @@ export async function buildApp(options: AppOptions = {}) {
   await fastify.register(getFeedDataRoutes);
   await fastify.register(userRout, { prefix: "/auth" });
   await fastify.register(lineItemRoutes, { prefix: "/line-item" });
+  await fastify.register(bidAdapterRoutes, { prefix: "/ad" });
 
   fastify.get("/", async () => {
     return { status: "ok" };
