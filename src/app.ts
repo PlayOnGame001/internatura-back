@@ -10,19 +10,23 @@ export type AppOptions = Partial<FastifyServerOptions>;
 
 export async function buildApp(options: AppOptions = {}) {
   const fastify = Fastify({ logger: true });
+
   await fastify.register(configPlugin);
   fastify.decorate("pluginLoaded", (pluginName: string) => {
     fastify.log.info(`✅ Plugin loaded: ${pluginName}`);
   });
 
+  // Подгружаем плагины из папки plugins (тут addservice будет зарегистрирован)
   await fastify.register(AutoLoad, {
     dir: join(__dirname, "plugins"),
     options,
   });
 
+  // Остальные роуты
   await fastify.register(healthRoute);
   await fastify.register(getFeedDataRoutes);
   await fastify.register(userRout, { prefix: "/auth" });
+
   fastify.get("/", async () => {
     return { status: "ok" };
   });
