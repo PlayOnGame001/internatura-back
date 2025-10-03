@@ -13,27 +13,26 @@ export async function bidAdapterRoutes(fastify: FastifyInstance) {
     ) => {
       const { size, geo, cpm } = req.body;
 
-      // Получаем все объекты
       const lineItems = await getAllLineItems(fastify);
 
-      const filtered = lineItems.filter((item: LineItem) => {
-        if (item.size !== size) return false;
-        if (geo && item.geo && item.geo !== geo) return false;
-        if (cpm < item.minCpm || cpm > item.maxCpm) return false;
+      const filtered = lineItems.filter(({size: itemSize, geo: itemGeo, maxCpm, minCpm}: LineItem) => {
+        if (size !== itemSize) return false;
+        if (geo !== itemGeo) return false;
+        if (cpm < minCpm || cpm > maxCpm) return false;
         return true;
       });
 
       if (filtered.length === 0) {
-        return reply.code(204).send();
+        return reply.noContent();
       }
 
-      const selected = filtered[0];
+      const {id, size: adSize, adType, creativeUrl} = filtered[0];
 
       return reply.send({
-        id: selected.id,
-        size: selected.size,
-        adType: selected.adType,
-        creativeUrl: selected.creativeUrl,
+        id: id,
+        size: adSize,
+        adType: adType,
+        creativeUrl: creativeUrl,
       });
     }
   );

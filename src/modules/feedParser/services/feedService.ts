@@ -1,9 +1,33 @@
+import { PrismaClient } from '@prisma/client';
 import { parseFeed as parseRssFeed } from "../feedParser.service";
 import * as cheerio from "cheerio";
-import { FeedItem, FeedCache} from "../types/types";
+import { FeedItem, FeedCache } from "../types/types";
+
+const prisma = new PrismaClient();
 
 let feedCache: FeedCache | null = null;
 const CACHE_TTL = 5 * 60 * 1000; // 5 минут
+
+export async function getAllFeeds() {
+  try {
+    const feeds = await prisma.feed.findMany({
+      select: {
+        id: true,
+        url: true,
+        title: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    
+    return feeds;
+  } catch (error) {
+    console.error('❌ Error fetching feeds from DB:', error);
+    throw error;
+  }
+}
 
 export async function getFeed(url?: string, force?: boolean): Promise<FeedItem[]> {
   const feedUrl = url || "https://news.ycombinator.com/rss";
@@ -32,7 +56,6 @@ export async function getFeed(url?: string, force?: boolean): Promise<FeedItem[]
       createdAt: new Date().toISOString(),
     }));
 
-
     feedCache = {
       items: feedItems,
       url: feedUrl,
@@ -43,15 +66,6 @@ export async function getFeed(url?: string, force?: boolean): Promise<FeedItem[]
   } catch (error) {
     return feedCache?.items || [];
   }
-}
-
-export async function getAllFeeds(): Promise<FeedItem[]> {
-  
-  if (!feedCache) {
-    return await getFeed();
-  }
-  
-  return feedCache.items;
 }
 
 export function saveFeedToCache(url: string, items: FeedItem[]): void {
@@ -69,17 +83,34 @@ export async function parseArticle(url: string) {
     const html = await res.text();
 
     const $ = cheerio.load(html);
+    const title = $("h1").first().text().trim() || $("title").text().trim();
+    $("script, style, nav, header, footer, aside, noscript, iframe, .advertisement, .ads, .promo, .subscribe, .related, .comments, .footer, .header").remove();
 
-    const title = $("h1").first().text() || $("title").text();
-    
-    $("script, style, nav, header, footer").remove();
-    const content = $("article").text().trim() || 
-                   $("main").text().trim() || 
-                   $("body").text().trim();
+    let content = "";
+    if ($("article").length) {
+      content = $("article").text().trim();
+    } else if ($("main").length) {
+      content = $("main").text().trim();
+    } else {
+      content = $("body").text().trim();
+    }
+    const unwantedPatterns = [
+      /Читайте також[\s\S]*$/i,
+      /Новини партнерів[\s\S]*$/i,
+      /Читайте УНІАН[\s\S]*$/i,
+      /Допоможіть проєкту[\s\S]*$/i
+    ];
 
-    return { 
-      title: title.trim(), 
-      content: content.substring(0, 5000)
+    unwantedPatterns.forEach(pattern => {
+      content = content.replace(pattern, '');
+    });
+    content = content.replace(/\s+/g, ' ').trim();
+    content = content.substring(0, 5000);
+
+    return {
+      title,
+      content,
+      url
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

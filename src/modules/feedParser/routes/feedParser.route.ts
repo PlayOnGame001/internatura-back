@@ -10,17 +10,15 @@ export async function getFeedDataRoutes(fastify: FastifyInstance) {
   const route = fastify.withTypeProvider<JsonSchemaToTsProvider>();
 
   route.get("/feed", { schema: getFeedSchema }, async (_request, reply) => {
-    try {
-      const feeds = await getAllFeeds();
-      
-      const response = feeds.map(feed => ({
-        id: feed.id,
-        url: feed.url,
-        title: feed.title,
-        createdAt: feed.createdAt,
-      }));
-      
-      return response;
+  try {
+    const feeds = await getAllFeeds();
+    const response = feeds.map(feed => ({
+      id: feed.id,
+      url: feed.url,
+      title: feed.title,
+      createdAt: feed.createdAt.toISOString(),
+    }));
+    return response;
     } catch (error) {
       fastify.log.error('❌ Error in /feed:', error);
       reply.status(500).send({ error: "Failed to fetch feeds" });

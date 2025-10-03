@@ -13,3 +13,10 @@ export interface FeedCache {
   url: string;
   timestamp: number;
 }
+
+export interface Feed {
+  id: string;
+  url: string;
+  title: string | null;
+  createdAt: string;
+}

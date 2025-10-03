@@ -108,12 +108,18 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node"]
   },
-  "include": ["src", "test-db.ts", "prisma/prismatest.ts"],
+  "include": ["src/**/*", "src/types/**/*.d.ts", "test-db.ts", "prisma/prismatest.ts"],
   "exclude": [
     "node_modules",
     "dist",
     "examples",
-  ]
+  ],
+  "ts-node": {
+    "files": true,
+    "transpileOnly": false
+  }
 }
