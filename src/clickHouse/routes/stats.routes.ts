@@ -1,3 +1,4 @@
+// add this file
 import { FastifyInstance } from "fastify";
 import { JsonSchemaToTsProvider } from "@fastify/type-provider-json-schema-to-ts";
 import { getEventsSchema } from "../schemas/statistic.schema";
