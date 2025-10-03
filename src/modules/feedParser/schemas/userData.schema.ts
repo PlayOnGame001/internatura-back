@@ -1,10 +1,11 @@
 export const registerSchema = {
   body: {
     type: "object",
-    required: ["email", "password"],
+    required: ["email", "password", "username"],
     properties: {
       email: { type: "string", format: "email" },
-      password: { type: "string", minLength: 6 },
+      username: { type: "string" },
+      password: { type: "string", minLength: 4 },
     },
   },
   response: {
@@ -13,6 +14,7 @@ export const registerSchema = {
       properties: {
         id: { type: "string" },
         email: { type: "string" },
+        username: { type: "string" },
       },
     },
     400: {

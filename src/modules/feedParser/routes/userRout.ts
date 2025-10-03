@@ -4,14 +4,20 @@ import { registerSchema, loginSchema } from "../schemas/userData.schema";
 
 export async function userRout(fastify: FastifyInstance) {
   fastify.post("/register", { schema: registerSchema }, async (request, reply) => {
-    const { email, password } = request.body as { email: string; password: string };
+    console.log("BODY:", request.body);
+    const { email, username, password } = request.body as {
+      email: string;
+      username: string;
+      password: string; 
+    };
     try {
-      const user = await registerUser(email, password);
+      const user = await registerUser(email, username, password);
       return reply.status(201).send(user);
     } catch (error: any) {
       return reply.status(400).send({ error: error.message });
     }
   });
+
   fastify.post("/login", { schema: loginSchema }, async (request, reply) => {
     const { email, password } = request.body as { email: string; password: string };
     try {
