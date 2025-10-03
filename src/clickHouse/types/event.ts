@@ -1,3 +1,4 @@
+// add this file
 export type EventType =
   | "load_page"
   | "load_ad_module"

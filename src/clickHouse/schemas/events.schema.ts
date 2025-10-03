@@ -1,3 +1,4 @@
+// add this file
 export const postEventSchema = {
   tags: ['Statistics'],
   summary: 'Create statistics event(s)',

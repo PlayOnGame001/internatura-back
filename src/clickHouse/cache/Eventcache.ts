@@ -13,8 +13,6 @@ export function initCacheFlusher(clickClient: ClickHouseClient) {
     try {
       await flushToClickhouse(clickClient);
     } catch (err) {
-      // логируем, но не падаем
-      // fastify логирует в роуте
       console.error("Failed flush to ClickHouse:", err);
     }
   }, FLUSH_INTERVAL);
@@ -47,7 +45,6 @@ export async function flushToClickhouse(clickClient: ClickHouseClient) {
     extra: ev.extra ? JSON.stringify(ev.extra) : ""
   }));
 
-  // сохраняем пакетом JSONEachRow
   await clickClient.insert({
     table: `${DB_NAME}.${TABLE_NAME}`,
     values: toInsert,

@@ -24,14 +24,13 @@ export async function buildApp(options: AppOptions = {}) {
     options,
     ignorePattern: /(addServer\.plugin\.(ts|js)|swagger\.plugin\.(ts|js))$/
   });
-
+  
   await fastify.register(cors, {
     origin: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"]
   });
-
   await fastify.register(healthRoute);
   await fastify.register(getFeedDataRoutes);
   await fastify.register(userRout, { prefix: "/auth" });
@@ -39,7 +38,6 @@ export async function buildApp(options: AppOptions = {}) {
   await fastify.register(bidAdapterRoutes, { prefix: "/ad" });
   await fastify.register(eventsRoutes, { prefix: "/api/statistics" });
   await fastify.register(statsRoutes, { prefix: "/api/statistics" });
-
   fastify.get("/", async () => {
     return { status: "ok" };
   });
