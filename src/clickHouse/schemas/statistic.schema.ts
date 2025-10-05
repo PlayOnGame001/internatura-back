@@ -1,3 +1,4 @@
+// add this file
 export const getEventsSchema = {
   tags: ['Statistics'],
   summary: 'Get paginated events with filters',
