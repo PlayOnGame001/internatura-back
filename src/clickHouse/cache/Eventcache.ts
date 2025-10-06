@@ -29,7 +29,7 @@ export async function flushToClickhouse(clickClient: ClickHouseClient) {
     id: ev.id,
     eventType: ev.eventType,
     ts: ev.ts,
-    ts_ms: BigInt(ev.ts_ms || Date.now()),
+    ts_ms: Number(ev.ts_ms || Date.now()),
     pageUrl: ev.pageUrl || "",
     referrer: ev.referrer || "",
     userAgent: ev.userAgent || "",
@@ -41,7 +41,7 @@ export async function flushToClickhouse(clickClient: ClickHouseClient) {
     cpm: ev.cpm ?? 0,
     auctionId: ev.auctionId || "",
     bidId: ev.bidId || "",
-    latencyMs: ev.latencyMs ?? 0,
+    latencyMs: Number(ev.latencyMs ?? 0),
     extra: ev.extra ? JSON.stringify(ev.extra) : ""
   }));
 
