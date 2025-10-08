@@ -12,14 +12,11 @@ const clickhousePlugin: FastifyPluginAsync = fp(async (fastify) => {
     password: process.env.CLICKHOUSE_PASSWORD || "",
   });
 
-  // сохраняем клиент
   fastify.decorate("clickhouse", client);
 
   try {
-    // создаём БД если нужно
     await client.exec({ query: `CREATE DATABASE IF NOT EXISTS ${DB_NAME}` });
 
-    // создаём таблицу (если нет)
     await client.exec({
       query: `
         CREATE TABLE IF NOT EXISTS ${DB_NAME}.${TABLE_NAME} (
