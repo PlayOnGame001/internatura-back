@@ -1,20 +1,5 @@
 import type { ClickHouseClient } from "@clickhouse/client";
 import type { StatsEvent } from "../types/event";
-import { createClient } from '@clickhouse/client'
-
-void (async () => {
-  const client = createClient({
-    url: 'https://pf9o7n3x78.europe-west4.gcp.clickhouse.cloud:8443',
-    username: 'default',
-    password: '',
-  })
-  const rows = await client.query({
-    query: 'SELECT 1',
-    format: 'JSONEachRow',
-  })
-  console.log('Result: ', await rows.json())
-})()
-
 
 let cache: StatsEvent[] = [];
 const MAX_CACHE = Number(process.env.EVENT_CACHE_MAX || 100);
@@ -40,11 +25,10 @@ export function addToCache(event: StatsEvent): boolean {
 
 export async function flushToClickhouse(clickClient: ClickHouseClient) {
   if (!cache.length) return;
-  
   const toInsert = cache.map(ev => ({
     id: ev.id,
     eventType: ev.eventType,
-    ts: new Date(ev.ts),
+    ts: ev.ts,
     ts_ms: Number(ev.ts_ms || Date.now()),
     pageUrl: ev.pageUrl || "",
     referrer: ev.referrer || "",
@@ -67,6 +51,5 @@ export async function flushToClickhouse(clickClient: ClickHouseClient) {
     format: "JSONEachRow",
   });
 
-  console.log(`Flushed ${toInsert.length} events to ClickHouse`);
   cache = [];
 }
