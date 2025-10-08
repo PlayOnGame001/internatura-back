@@ -1,12 +1,14 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { BidRequest, LineItem } from '../types/BidAdapter.Interface';
 import { getAllLineItems } from '../service/BidAdapter.service';
+import { bidRequestSchema } from '../schemas/BidAdapter.schema';
 
 export async function bidAdapterRoutes(fastify: FastifyInstance) {
   fastify.log.info('✅ bidAdapterRoutes plugin is registering');
 
   fastify.post<{ Body: BidRequest }>(
     '/bid',
+    { schema: bidRequestSchema },
     async (
       req: FastifyRequest<{ Body: BidRequest }>,
       reply: FastifyReply
