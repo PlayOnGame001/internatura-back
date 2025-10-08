@@ -1,3 +1,4 @@
+import './telemetria/info';
 import { buildApp } from "./app";
 import { initializeFeeds } from "./modules/feedParser/services/feedInitService";
 

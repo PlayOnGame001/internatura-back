@@ -1,4 +1,3 @@
-// add this file
 export const getEventsSchema = {
   tags: ['Statistics'],
   summary: 'Get paginated events with filters',
@@ -74,15 +73,14 @@ export const getEventsSchema = {
             properties: {
               id: { type: 'string' },
               eventType: { type: 'string' },
-              ts: { type: 'string', format: 'date-time' },
+              ts: { type: 'string' },
               ts_ms: { type: 'number' },
               pageUrl: { type: 'string' },
               adUnit: { type: 'string' },
               creativeId: { type: 'string' },
-              cpm: { type: 'number', nullable: true },
+              cpm: { type: 'number' },
               adapter: { type: 'string' }
-            },
-            required: ['id', 'eventType', 'ts', 'ts_ms']
+            }
           }
         }
       },
