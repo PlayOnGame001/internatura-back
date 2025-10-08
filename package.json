@@ -1,11 +1,11 @@
 {
   "name": "feed",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "scripts": {
     "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"tsc -w\" \"nodemon\"",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node build/index.js"
   },
   "author": "",
   "license": "ISC",
