@@ -7,7 +7,7 @@ import { userRout } from "./modules/feedParser/routes/userRout";
 import { healthRoute } from "./modules/feedParser/routes/health.route";
 import { lineItemRoutes } from "./modules/AddService/route/lineItem.routes";
 import { bidAdapterRoutes } from "./modules/AddService/route/BidAdapter.routes";
-import { eventsRoutes } from "../src/clickHouse/routes/Events.routs";
+import { eventsRoutes } from "./clickHouse/routes/Events.routes";
 import { statsRoutes } from "../src/clickHouse/routes/stats.routes";
 import cors from "@fastify/cors";
 
