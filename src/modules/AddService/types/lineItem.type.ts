@@ -54,23 +54,19 @@ export async function handleCreate(
 
   for await (const part of parts) {
     if (part.type === 'file') {
-      // сохраняем файл
       const filename = `${Date.now()}_${part.filename}`;
       const filePath = path.join(uploadsDir, filename);
       await pipeline(part.file, fs.createWriteStream(filePath));
       savedFilePath = `/uploads/${filename}`;
     } else {
-      // безопасно обрабатываем поле
       if (typeof part.value === 'string') {
         fields[part.fieldname] = part.value;
       } else {
-        // если вдруг пришло не строковое значение
         fields[part.fieldname] = String(part.value);
       }
     }
   }
 
-  // создаем объект для БД с правильными типами
   const data = {
     size: fields.size,
     minCpm: parseFloat(fields.minCpm),
