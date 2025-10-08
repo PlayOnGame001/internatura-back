@@ -2,24 +2,27 @@ import fp from "fastify-plugin";
 import { createClient, type ClickHouseClient } from "@clickhouse/client";
 import type { FastifyPluginAsync } from "fastify";
 
-const DB_NAME = process.env.CLICKHOUSE_DB || "mydb";
+const DB_NAME = process.env.CLICKHOUSE_DATABASE || process.env.CLICKHOUSE_DB || "analytics";
 const TABLE_NAME = process.env.CLICKHOUSE_TABLE || "events";
 
 const clickhousePlugin: FastifyPluginAsync = fp(async (fastify) => {
+  const clickhouseHost = process.env.CLICKHOUSE_HOST || "localhost";
+  const clickhousePort = process.env.CLICKHOUSE_PORT || "8123";
+  const clickhouseUrl = `http://${clickhouseHost}:${clickhousePort}`;
+
   const client: ClickHouseClient = createClient({
-    host: process.env.CLICKHOUSE_URL || "http://localhost:8123",
+    url: clickhouseUrl,
+    database: DB_NAME,
     username: process.env.CLICKHOUSE_USER || "default",
     password: process.env.CLICKHOUSE_PASSWORD || "",
   });
 
-  // сохраняем клиент
   fastify.decorate("clickhouse", client);
 
   try {
-    // создаём БД если нужно
+    await client.ping();
+    fastify.log.info(`✅ ClickHouse connected: ${clickhouseUrl}`);
     await client.exec({ query: `CREATE DATABASE IF NOT EXISTS ${DB_NAME}` });
-
-    // создаём таблицу (если нет)
     await client.exec({
       query: `
         CREATE TABLE IF NOT EXISTS ${DB_NAME}.${TABLE_NAME} (
@@ -45,17 +48,17 @@ const clickhousePlugin: FastifyPluginAsync = fp(async (fastify) => {
       `
     });
 
-    fastify.log.info("ClickHouse database and table initialized");
+    fastify.log.info(`✅ ClickHouse database '${DB_NAME}' and table '${TABLE_NAME}' initialized`);
   } catch (err) {
-    fastify.log.error(err, "Failed to initialize ClickHouse");
+    fastify.log.error(err, "❌ Failed to initialize ClickHouse");
     throw err;
   }
-
   fastify.addHook("onClose", async () => {
     try {
-      fastify.log.info("ClickHouse plugin closed");
+      await client.close();
+      fastify.log.info("ClickHouse connection closed");
     } catch (e) {
-      fastify.log.error(e);
+      fastify.log.error(e, "Error closing ClickHouse");
     }
   });
 });
