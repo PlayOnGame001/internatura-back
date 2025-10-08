@@ -84,7 +84,7 @@ export async function parseArticle(url: string) {
 
     const $ = cheerio.load(html);
     const title = $("h1").first().text().trim() || $("title").text().trim();
-    $("script, style, nav, header, footer, aside, noscript, iframe, .advertisement, .ads, .promo, .subscribe, .related, .comments, .footer, .header").remove();
+    $("script, style, nav, header, footer, aside, noscript, iframe, .advertisement, .ads, .promo, .subscribe, .related, .comments, .footer, .header, .top-bredcr ").remove();
 
     let content = "";
     if ($("article").length) {
@@ -98,9 +98,9 @@ export async function parseArticle(url: string) {
       /Читайте також[\s\S]*$/i,
       /Новини партнерів[\s\S]*$/i,
       /Читайте УНІАН[\s\S]*$/i,
+      /Інформаційне агентство\+ Новини› Війна\s*$/i,
       /Допоможіть проєкту[\s\S]*$/i
     ];
-
     unwantedPatterns.forEach(pattern => {
       content = content.replace(pattern, '');
     });
