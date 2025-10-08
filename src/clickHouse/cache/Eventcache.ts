@@ -1,5 +1,20 @@
 import type { ClickHouseClient } from "@clickhouse/client";
 import type { StatsEvent } from "../types/event";
+import { createClient } from '@clickhouse/client'
+
+void (async () => {
+  const client = createClient({
+    url: 'https://pf9o7n3x78.europe-west4.gcp.clickhouse.cloud:8443',
+    username: 'default',
+    password: '',
+  })
+  const rows = await client.query({
+    query: 'SELECT 1',
+    format: 'JSONEachRow',
+  })
+  console.log('Result: ', await rows.json())
+})()
+
 
 let cache: StatsEvent[] = [];
 const MAX_CACHE = Number(process.env.EVENT_CACHE_MAX || 100);
