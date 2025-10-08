@@ -25,10 +25,11 @@ export function addToCache(event: StatsEvent): boolean {
 
 export async function flushToClickhouse(clickClient: ClickHouseClient) {
   if (!cache.length) return;
+  
   const toInsert = cache.map(ev => ({
     id: ev.id,
     eventType: ev.eventType,
-    ts: ev.ts,
+    ts: new Date(ev.ts),
     ts_ms: Number(ev.ts_ms || Date.now()),
     pageUrl: ev.pageUrl || "",
     referrer: ev.referrer || "",
@@ -51,5 +52,6 @@ export async function flushToClickhouse(clickClient: ClickHouseClient) {
     format: "JSONEachRow",
   });
 
+  console.log(`Flushed ${toInsert.length} events to ClickHouse`);
   cache = [];
 }
