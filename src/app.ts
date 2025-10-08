@@ -8,7 +8,7 @@ import { healthRoute } from "./modules/feedParser/routes/health.route";
 import { lineItemRoutes } from "./modules/AddService/route/lineItem.routes";
 import { bidAdapterRoutes } from "./modules/AddService/route/BidAdapter.routes";
 import { eventsRoutes } from "./clickHouse/routes/Events.routes";
-import { statsRoutes } from "../src/clickHouse/routes/stats.routes";
+import { statsRoutes } from "./clickHouse/routes/stats.routes";
 import cors from "@fastify/cors";
 
 export type AppOptions = Partial<FastifyServerOptions>;
