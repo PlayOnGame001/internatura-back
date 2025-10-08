@@ -8,14 +8,14 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
-      - CLICKHOUSE_PORT=${CLICKHOUSE_PORT}
-      - CLICKHOUSE_DATABASE=${CLICKHOUSE_DATABASE}
-      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
-      - PORT=${PORT}
-      - HOST=${HOST}
+      - DATABASE_URL=${DATABASE_URL:-mongodb://mongo:27017/feeds?replicaSet=rs0}
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST:-clickhouse}
+      - CLICKHOUSE_PORT=${CLICKHOUSE_PORT:-8123}
+      - CLICKHOUSE_DATABASE=${CLICKHOUSE_DATABASE:-analytics}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-}
+      - PORT=${PORT:-3000}
+      - HOST=${HOST:-0.0.0.0}
     depends_on:
       - mongo
       - clickhouse
